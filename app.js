@@ -21,8 +21,14 @@ app.use(function(req, res, next) {
     next(createError(404));
 });
 
-app.get('*', function(req, res) {  
-    res.redirect('https://' + req.headers.host + req.url);
+app.configure('production', () => {
+  	app.use((req, res, next) => {
+	    if (req.header('x-forwarded-proto') !== 'https') {
+	      res.redirect(`https://${req.header('host')}${req.url}`);
+	    } else {
+	      next();
+	    }
+  	})
 });
 
 app.get('/', (req, res, next) => {
